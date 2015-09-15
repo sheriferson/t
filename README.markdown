@@ -119,6 +119,27 @@ Listing your tasks is even easier -- just use `t`:
 
 `t` will list all of your unfinished tasks and their IDs.
 
+### Mark a task for today
+
+To mark a task for today (by appending 'today: ' to the task), use `t -t ID`
+(note that the `-t` operator used to be short for `--task-dir`, which has now been changed to `-k`)
+
+    $ t -t 9
+    9 - today: Buy more beer
+    $
+
+Using the `-t` operator on a task that already has `today: ` as a prefix will umark it as a today task:
+
+    $ t -t 9
+    9 - Buy more beer
+    $
+
+I find it helpful to mark a few tasks for "today", and then list only those tasks using a `today` alias set up in my `.zshrc` (or your `.bashrc`) file:
+
+    alias today='t -g today:'
+
+The alias runs t with the `-g` operator that runs a grep search for the `today:` string in all tasks. This _will_ return a task that has `today:` somewhere in the middle, but that's just not something that will ever exist in any of my tasks.
+
 ### Finish a Task
 
 After you're done with something, use `t -f ID` to finish it:
@@ -128,6 +149,8 @@ After you're done with something, use `t -f ID` to finish it:
     9  - Buy more beer.
     30 - Clean the apartment.
     $
+
+When finishing a task, `t` will remove the `today: ` prefix if it existed at the beginning of the task.
 
 ### Edit a Task
 

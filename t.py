@@ -184,6 +184,22 @@ class TaskDict(object):
 
         task['text'] = text
 
+    def make_task_today(self, prefix):
+        """Mark task for today by adding 'today: ' to the beginning of the text. 
+        If the task is already marked for today, will remove it from the today list 
+        by removing the 'today: ' prefix."""
+
+        task = self[prefix]
+
+        if task['text'].startswith('today: '):
+            # task['text'] = task['text']
+            task['text'] = task['text'][len('today: '):]
+            print "Task removed from today."
+        else:
+            task['text'] = 'today: ' + task['text']
+
+        print task['text']
+
     def finish_task(self, prefix):
         """Mark the task with the given prefix as finished.
 
@@ -193,6 +209,9 @@ class TaskDict(object):
 
         """
         task = self.tasks.pop(self[prefix]['id'])
+        if task['text'].startswith('today: '):
+            task['text'] = task['text'][len('today: '):]
+        print "You completed: " + task['text']
         self.done[task['id']] = task
 
     def remove_task(self, prefix):
@@ -203,7 +222,8 @@ class TaskDict(object):
         be raised.
 
         """
-        self.tasks.pop(self[prefix]['id'])
+        removedTask = self.tasks.pop(self[prefix]['id'])
+        print "You removed: " + removedTask['text']
 
 
     def print_list(self, kind='tasks', verbose=False, quiet=False, grep=''):
@@ -246,6 +266,8 @@ def _build_parser():
         "If no actions are specified the TEXT will be added as a new task.")
     actions.add_option("-e", "--edit", dest="edit", default="",
                        help="edit TASK to contain TEXT", metavar="TASK")
+    actions.add_option("-t", "--today", dest="today",
+                       help="mark the task for today or remove from today", metavar="TASK")
     actions.add_option("-f", "--finish", dest="finish",
                        help="mark TASK as finished", metavar="TASK")
     actions.add_option("-r", "--remove", dest="remove",
@@ -255,7 +277,8 @@ def _build_parser():
     config = OptionGroup(parser, "Configuration Options")
     config.add_option("-l", "--list", dest="name", default="tasks",
                       help="work on LIST", metavar="LIST")
-    config.add_option("-t", "--task-dir", dest="taskdir", default="",
+    # Special editing note here: below used to be -t not -k. S edit
+    config.add_option("-k", "--task-dir", dest="taskdir", default="",
                       help="work on the lists in DIR", metavar="DIR")
     config.add_option("-d", "--delete-if-empty",
                       action="store_true", dest="delete", default=False,
@@ -294,6 +317,9 @@ def _main():
             td.write(options.delete)
         elif options.edit:
             td.edit_task(options.edit, text)
+            td.write(options.delete)
+        elif options.today:
+            td.make_task_today(options.today)
             td.write(options.delete)
         elif text:
             td.add_task(text)
