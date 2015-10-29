@@ -78,6 +78,9 @@ Installing and setting up `t` will take about one minute.
 First, [download][] the newest version or clone the Mercurial repository
 (`hg clone http://bitbucket.org/sjl/t/`).  Put it anywhere you like.
 
+_**Note**: That download will give you the original `t` that this repo is a fork of.
+That original `t` will not have the "mark for today" functionality described below._
+
 [download]: http://bitbucket.org/sjl/t/get/tip.zip
 
 Next, decide where you want to keep your todo lists.  I put mine in `~/tasks`.
@@ -121,24 +124,25 @@ Listing your tasks is even easier -- just use `t`:
 
 ### Mark a task for today
 
-To mark a task for today (by appending 'today: ' to the task), use `t -t ID`
+To mark a task for today (by appending `@today` as a suffix tag to the task[^1]), use `t -t ID`
 (note that the `-t` operator used to be short for `--task-dir`, which has now been changed to `-k`)
 
     $ t -t 9
-    9 - today: Buy more beer
+    Buy more beer @today
     $
 
-Using the `-t` operator on a task that already has `today: ` as a prefix will umark it as a today task:
+Using the `-t` operator on a task that already has `@today` as a suffix will umark it as a today task:
 
     $ t -t 9
-    9 - Buy more beer
+    Task removed from today.
+    Buy more beer
     $
 
 I find it helpful to mark a few tasks for "today", and then list only those tasks using a `today` alias set up in my `.zshrc` (or your `.bashrc`) file:
 
-    alias today='t -g today:'
+    alias today='t -g @today'
 
-The alias runs t with the `-g` operator that runs a grep search for the `today:` string in all tasks. This _will_ return a task that has `today:` somewhere in the middle, but that's just not something that will ever exist in any of my tasks.
+The alias runs t with the `-g` operator that runs a grep search for the `@today` string in all tasks. This _will_ return a task that has `@today` somewhere in the middle, but that's just not something that will ever exist in any of my tasks.
 
 ### Finish a Task
 
@@ -247,3 +251,5 @@ a pull request.
 
 [Mercurial repository]: http://bitbucket.org/sjl/t/
 [git mirror]: http://github.com/sjl/t/
+
+[^1]: This tagging system inspired by [Taskpaper](!g "taskpaper app").

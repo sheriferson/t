@@ -185,18 +185,21 @@ class TaskDict(object):
         task['text'] = text
 
     def make_task_today(self, prefix):
-        """Mark task for today by adding 'today: ' to the beginning of the text. 
+        """Mark task for today by adding '@today' to the end of the text. 
         If the task is already marked for today, will remove it from the today list 
-        by removing the 'today: ' prefix."""
+        by removing the '@today' suffix."""
 
         task = self[prefix]
 
-        if task['text'].startswith('today: '):
-            # task['text'] = task['text']
-            task['text'] = task['text'][len('today: '):]
+        # first check if task includes today tags
+        # if it does, remove them and strip whitespace
+        if task['text'].endswith("@today"):
+            # remove the @today tag and strip remaining whitespace
+            task['text'] = task['text'][:-len('@today')].strip()
             print "Task removed from today."
         else:
-            task['text'] = 'today: ' + task['text']
+            # add suffix @today tag
+            task['text'] = task['text'] + " @today"
 
         print task['text']
 
@@ -209,8 +212,8 @@ class TaskDict(object):
 
         """
         task = self.tasks.pop(self[prefix]['id'])
-        if task['text'].startswith('today: '):
-            task['text'] = task['text'][len('today: '):]
+        if task['text'].endswith("@today"):
+            task['text'] = task['text'][:-len('@today')].strip()
         print "You completed: " + task['text']
         self.done[task['id']] = task
 
