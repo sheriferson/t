@@ -7,6 +7,7 @@ from __future__ import with_statement
 import os, re, sys, hashlib
 from operator import itemgetter
 from optparse import OptionParser, OptionGroup
+import time # S: I will use this to append unix epoch time to finished tasks
 
 
 class InvalidTaskfile(Exception):
@@ -215,6 +216,9 @@ class TaskDict(object):
         if task['text'].endswith("@today"):
             task['text'] = task['text'][:-len('@today')].strip()
         print "You completed: " + task['text']
+        unixTimeNow = int(time.mktime(time.localtime()))
+        task['text'] = task['text'] + " [" + str(unixTimeNow) + "]" # S edit
+        task['id'] = _hash(task['text']) # S edit
         self.done[task['id']] = task
 
     def remove_task(self, prefix):
