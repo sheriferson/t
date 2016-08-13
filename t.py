@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
 """t is for people that want do things, not organize their tasks."""
@@ -184,6 +185,7 @@ class TaskDict(object):
             text = re.sub(find, repl, task['text'])
 
         task['text'] = text
+        print(u'🚧 ' + ' ' + text)
 
     def make_task_today(self, prefix):
         """Mark task for today by adding '@today' to the end of the text. 
@@ -197,12 +199,11 @@ class TaskDict(object):
         if task['text'].endswith("@today"):
             # remove the @today tag and strip remaining whitespace
             task['text'] = task['text'][:-len('@today')].strip()
-            print "Task removed from today."
+            print(u'❌  📅 ' + ' ' + task['text'])
         else:
             # add suffix @today tag
             task['text'] = task['text'] + " @today"
-
-        print task['text']
+            print(u'📅 ' + ' ' + task['text'])
 
     def finish_task(self, prefix):
         """Mark the task with the given prefix as finished.
@@ -215,7 +216,7 @@ class TaskDict(object):
         task = self.tasks.pop(self[prefix]['id'])
         if task['text'].endswith("@today"):
             task['text'] = task['text'][:-len('@today')].strip()
-        print "You completed: " + task['text']
+        print(u'🏅 ' + ' ' + task['text'])
         unixTimeNow = int(time.mktime(time.localtime()))
         task['text'] = task['text'] + " [" + str(unixTimeNow) + "]" # S edit
         task['id'] = _hash(task['text']) # S edit
@@ -230,7 +231,7 @@ class TaskDict(object):
 
         """
         removedTask = self.tasks.pop(self[prefix]['id'])
-        print "You removed: " + removedTask['text']
+        print(u'❌ ' + ' ' + removedTask['text'])
 
 
     def print_list(self, kind='tasks', verbose=False, quiet=False, grep=''):
@@ -246,7 +247,7 @@ class TaskDict(object):
         for _, task in sorted(tasks.items()):
             if grep.lower() in task['text'].lower():
                 p = '%s - ' % task[label].ljust(plen) if not quiet else ''
-                print p + task['text']
+                print(p + task['text'])
 
     def write(self, delete_if_empty=False):
         """Flush the finished and unfinished tasks to the files on disk."""
