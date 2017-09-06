@@ -9,7 +9,7 @@ import sys
 import hashlib
 
 from operator import itemgetter
-from optparse import OptionParser, OptionGroup
+from optparse import OptionParser, OptionGroup # pylint: disable=deprecated-module
 import time # for appending unix epoch time to finished tasks
 import datetime # for replacing date with @today tag on the day
 
@@ -102,29 +102,31 @@ def _prefixes(ids):
     entire ID will be the prefix.
     """
     ps = {}
-    for id in ids:
-        id_len = len(id)
-        for i in range(1, id_len+1):
+    ii = None
+    jj = None
+    for task_id in ids:
+        id_len = len(task_id)
+        for ii in range(1, id_len+1):
             # identifies an empty prefix slot, or a singular collision
-            prefix = id[:i]
+            prefix = task_id[:ii]
             if (not prefix in ps) or (ps[prefix] and prefix != ps[prefix]):
                 break
         if prefix in ps:
             # if there is a collision
             other_id = ps[prefix]
-            for j in range(i, id_len + 1):
-                if other_id[:j] == id[:j]:
-                    ps[id[:j]] = ''
+            for jj in range(ii, id_len + 1):
+                if other_id[:jj] == task_id[:jj]:
+                    ps[task_id[:jj]] = ''
                 else:
-                    ps[other_id[:j]] = other_id
-                    ps[id[:j]] = id
+                    ps[other_id[:jj]] = other_id
+                    ps[task_id[:jj]] = task_id
                     break
             else:
-                ps[other_id[:id_len+1]] = other_id
-                ps[id] = id
+                ps[other_id[:id_len + 1]] = other_id
+                ps[task_id] = task_id
         else:
             # no collision, can safely add
-            ps[prefix] = id
+            ps[prefix] = task_id
     ps = dict(zip(ps.values(), ps.keys()))
     if '' in ps:
         del ps['']
@@ -168,13 +170,13 @@ class TaskDict(object):
         """
         matched = filter(lambda tid: tid.startswith(prefix), self.tasks.keys())
         if len(matched) == 1:
-            return self.tasks[matched[0]]
+            return self.tasks[matched[0]] # pylint: disable=unsubscriptable-object
         elif len(matched) == 0:
             raise UnknownPrefix(prefix)
         else:
             matched = filter(lambda tid: tid == prefix, self.tasks.keys())
             if len(matched) == 1:
-                return self.tasks[matched[0]]
+                return self.tasks[matched[0]] # pylint: disable=unsubscriptable-object
             else:
                 raise AmbiguousPrefix(prefix)
 
