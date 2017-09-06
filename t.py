@@ -1,43 +1,55 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """t is for people that want do things, not organize their tasks."""
 
-from __future__ import with_statement
+import os
+import re
+import sys
+import hashlib
 
-import os, re, sys, hashlib
 from operator import itemgetter
 from optparse import OptionParser, OptionGroup
-import time # S: I will use this to append unix epoch time to finished tasks
-
+import time # for appending unix epoch time to finished tasks
+import datetime # for replacing date with @today tag on the day
 
 class InvalidTaskfile(Exception):
-    """Raised when the path to a task file already exists as a directory."""
+    """
+    Raised when the path to a task file already exists as a directory.
+    """
+
     pass
 
 class AmbiguousPrefix(Exception):
-    """Raised when trying to use a prefix that could identify multiple tasks."""
+    """
+    Raised when trying to use a prefix that could identify multiple tasks.
+    """
+
     def __init__(self, prefix):
         super(AmbiguousPrefix, self).__init__()
         self.prefix = prefix
 
 class UnknownPrefix(Exception):
-    """Raised when trying to use a prefix that does not match any tasks."""
+    """
+    Raised when trying to use a prefix that does not match any tasks.
+    """
+
     def __init__(self, prefix):
         super(UnknownPrefix, self).__init__()
         self.prefix = prefix
 
 
 def _hash(text):
-    """Return a hash of the given text for use as an id.
+    """
+    Return a hash of the given text for use as an id.
 
     Currently SHA1 hashing is used.  It should be plenty for our purposes.
-
     """
     return hashlib.sha1(text).hexdigest()
 
 def _task_from_taskline(taskline):
-    """Parse a taskline (from a task file) and return a task.
+    """
+    Parse a taskline (from a task file) and return a task.
 
     A taskline should be in the format:
 
@@ -57,17 +69,19 @@ def _task_from_taskline(taskline):
         return None
     elif '|' in taskline:
         text, _, meta = taskline.rpartition('|')
-        task = { 'text': text.strip() }
+        task = {'text': text.strip()}
         for piece in meta.strip().split(','):
             label, data = piece.split(':')
             task[label.strip()] = data.strip()
     else:
         text = taskline.strip()
-        task = { 'id': _hash(text), 'text': text }
+        task = {'id': _hash(text), 'text': text}
     return task
 
 def _tasklines_from_tasks(tasks):
-    """Parse a list of tasks into tasklines suitable for writing."""
+    """
+    Parse a list of tasks into tasklines suitable for writing.
+    """
 
     tasklines = []
 
@@ -98,7 +112,7 @@ def _prefixes(ids):
         if prefix in ps:
             # if there is a collision
             other_id = ps[prefix]
-            for j in range(i, id_len+1):
+            for j in range(i, id_len + 1):
                 if other_id[:j] == id[:j]:
                     ps[id[:j]] = ''
                 else:
@@ -188,8 +202,8 @@ class TaskDict(object):
         print(u'🚧 ' + ' ' + text)
 
     def make_task_today(self, prefix):
-        """Mark task for today by adding '@today' to the end of the text. 
-        If the task is already marked for today, will remove it from the today list 
+        """Mark task for today by adding '@today' to the end of the text.
+        If the task is already marked for today, will remove it from the today list
         by removing the '@today' suffix."""
 
         task = self[prefix]
@@ -205,6 +219,24 @@ class TaskDict(object):
             task['text'] = task['text'] + " @today"
             print(u'📅 ' + ' ' + task['text'])
 
+    def check_today_date(self):
+        """
+        Check if any tasks have a tag with today's date.
+        If one does, replace the date with @today tag.
+        """
+        today_date = '@' + str(datetime.date.today())
+        date_updated = False
+
+        tasks = dict(getattr(self, 'tasks').items())
+
+        for task in tasks.values():
+            if today_date in task['text']:
+                task['text'] = task['text'].replace(today_date, '@today')
+                date_updated = True
+
+        return(date_updated)
+
+
     def finish_task(self, prefix):
         """Mark the task with the given prefix as finished.
 
@@ -218,7 +250,7 @@ class TaskDict(object):
             task['text'] = task['text'][:-len('@today')].strip()
         print(u'🏅 ' + ' ' + task['text'])
         unixTimeNow = int(time.mktime(time.localtime()))
-        task['text'] = task['text'] + " [" + str(unixTimeNow) + "]" # S edit
+        task['text'] = task['text'] + " [" + str(unixTimeNow) + "]"
         task['id'] = _hash(task['text']) # S edit
         self.done[task['id']] = task
 
@@ -271,7 +303,7 @@ def _build_parser():
     parser = OptionParser(usage=usage)
 
     actions = OptionGroup(parser, "Actions",
-        "If no actions are specified the TEXT will be added as a new task.")
+                          "If no actions are specified the TEXT will be added as a new task.")
     actions.add_option("-e", "--edit", dest="edit", default="",
                        help="edit TASK to contain TEXT", metavar="TASK")
     actions.add_option("-t", "--today", dest="today",
@@ -333,14 +365,15 @@ def _main():
             td.add_task(text)
             td.write(options.delete)
         else:
+            if td.check_today_date():
+                td.write(options.delete)
             kind = 'tasks' if not options.done else 'done'
             td.print_list(kind=kind, verbose=options.verbose, quiet=options.quiet,
                           grep=options.grep)
-    except AmbiguousPrefix, e:
+    except AmbiguousPrefix as e:
         sys.stderr.write('The ID "%s" matches more than one task.\n' % e.prefix)
-    except UnknownPrefix, e:
+    except UnknownPrefix as e:
         sys.stderr.write('The ID "%s" does not match any task.\n' % e.prefix)
-
 
 if __name__ == '__main__':
     _main()
