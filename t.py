@@ -204,22 +204,46 @@ class TaskDict(object):
         print(u'🚧 ' + ' ' + text)
 
     def make_task_today(self, prefix):
-        """Mark task for today by adding '@today' to the end of the text.
-        If the task is already marked for today, will remove it from the today list
-        by removing the '@today' suffix."""
+        """
+        Toggle status of task as being marked for today.
+        The toggle is done by adding or removing the @today tag.
+        """
 
         task = self[prefix]
 
-        # first check if task includes today tags
-        # if it does, remove them and strip whitespace
-        if task['text'].endswith("@today"):
-            # remove the @today tag and strip remaining whitespace
-            task['text'] = task['text'][:-len('@today')].strip()
+        # first check if task includes today tag
+        # if it does, remove them and strip extraneous whitespace
+        if '@today' in task['text']:
+            # remove the @today tag and strip extraneous whitespace
+            task['text'] = task['text'] \
+                           .replace('@today', '') \
+                           .replace('  ', ' ') \
+                           .strip()
             print(u'❌  📅 ' + ' ' + task['text'])
         else:
             # add suffix @today tag
             task['text'] = task['text'] + " @today"
             print(u'📅 ' + ' ' + task['text'])
+
+    def make_task_now(self, prefix):
+        """
+        Toggle status of task as what I'm working on right now.
+        The toggle is done by adding or removing the @now tag.
+        """
+        task = self[prefix]
+
+        # check if task is already marked with @now
+        # if it is, remove @now tag and strip extraneous whitespace
+        if '@now' in task['text']:
+            task['text'] = task['text'] \
+                           .replace('@now', ' ') \
+                           .replace('  ', ' ') \
+                           .strip()
+            print(u'❌  🎯 ' + ' ' + task['text'])
+        else:
+            # add @now tag
+            task['text'] = task['text'] + " @now"
+            print(u'🎯 ' + ' ' + task['text'])
 
     def check_today_date(self):
         """
@@ -248,8 +272,12 @@ class TaskDict(object):
 
         """
         task = self.tasks.pop(self[prefix]['id'])
-        if task['text'].endswith("@today"):
-            task['text'] = task['text'][:-len('@today')].strip()
+        task['text'] = task['text'] \
+                       .replace('@today', '') \
+                       .replace('@now', '') \
+                       .replace('  ', ' ') \
+                       .strip()
+
         print(u'🏅 ' + ' ' + task['text'])
         unixTimeNow = int(time.mktime(time.localtime()))
         task['text'] = task['text'] + " [" + str(unixTimeNow) + "]"
@@ -309,7 +337,11 @@ def _build_parser():
     actions.add_option("-e", "--edit", dest="edit", default="",
                        help="edit TASK to contain TEXT", metavar="TASK")
     actions.add_option("-t", "--today", dest="today",
-                       help="mark the task for today or remove from today", metavar="TASK")
+                       help="mark the task for today or remove from today",
+                       metavar="TASK")
+    actions.add_option("-n", "--now", dest="now",
+                       help="toggle the status of the task as what I'm doing now with @now tag",
+                       metavar="TASK")
     actions.add_option("-f", "--finish", dest="finish",
                        help="mark TASK as finished", metavar="TASK")
     actions.add_option("-r", "--remove", dest="remove",
@@ -363,6 +395,9 @@ def _main():
         elif options.today:
             td.make_task_today(options.today)
             td.write(options.delete)
+        elif options.now:
+            td.make_task_now(options.now)
+            td.write(options.now)
         elif text:
             td.add_task(text)
             td.write(options.delete)

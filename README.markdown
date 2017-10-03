@@ -80,20 +80,24 @@ Make sure you run `source ~/.bashrc` or restart your terminal window to make the
 
 To add a task, use `t [task description]`:
 
-    $ t Clean the apartment.
-    $ t Write chapter 10 of the novel.
-    $ t Buy more beer.
-    $
+```bash
+$ t Clean the apartment.
+$ t Write chapter 10 of the novel.
+$ t Buy more beer.
+$
+```
 
 ### List your tasks
 
 Listing your tasks is even easier -- just use `t`:
 
-    $ t
-    9  - Buy more beer.
-    30 - Clean the apartment.
-    31 - Write chapter 10 of the novel.
-    $
+```bash
+$ t
+9  - Buy more beer.
+30 - Clean the apartment.
+31 - Write chapter 10 of the novel.
+$
+```
 
 `t` will list all of your unfinished tasks and their IDs.
 
@@ -104,22 +108,48 @@ _Note: This is a feature added in this fork and not available in the original pr
 To mark a task for today (by appending `@today` as a suffix tag to the task[^1]), use `t -t ID`
 (note that the `-t` operator used to be short for `--task-dir`, which has now been changed to `-k`)
 
-    $ t -t 9
-    Buy more beer @today
-    $
+```bash
+$ t -t 9
+📅 Buy more beer @today
+$
+```
 
 Using the `-t` operator on a task that already has `@today` as a suffix will umark it as a today task:
 
-    $ t -t 9
-    Task removed from today.
-    Buy more beer
-    $
+```bash
+$ t -t 9
+❌ 📅  Buy more beer
+$
+```
 
 I find it helpful to mark a few tasks for "today", and then list only those tasks using a `today` alias set up in my `.zshrc` (or your `.bashrc`) file:
 
     alias today='t -g @today'
 
 The alias runs t with the `-g` operator that runs a grep search for the `@today` string in all tasks. This _will_ return a task that has `@today` somewhere in the middle, but that's just not something that will ever exist in any of my tasks.
+
+### Mark a task as what I'm doing now
+
+_Note: This is a feature added in this fork and not available in the original project._
+
+It's useful to focus on one task at a time. To formalize this, one can mark that task by adding `@now` using the `-n` switch.
+
+```bash
+$ t Finish updating t README
+$ t
+...
+2c - Finish updating t README
+...
+$ t -n 2c
+$ 🎯 Finish updating t README @now
+```
+
+Using the switch again will remove the `@now` tag:
+
+```bash
+$ t -n 2c
+$ ❌ 🎯 Finish updating t README
+```
 
 ### Add a date to a task
 
@@ -200,9 +230,11 @@ Want a count of your tasks right in your prompt? Edit your `~/.bashrc` file:
 
 Now you've got a prompt that looks something like this:
 
-    [2] $ t -f 30
-    [1] $ t Feed the cat.
-    [2] $
+```bash
+[2] $ t -f 30
+[1] $ t Feed the cat.
+[2] $
+```
 
 ### Multiple lists
 
