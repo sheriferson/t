@@ -236,7 +236,7 @@ class TaskDict(object):
         # if it is, remove @now tag and strip extraneous whitespace
         if '@now' in task['text']:
             task['text'] = task['text'] \
-                           .replace('@now', ' ') \
+                           .replace('@now', '') \
                            .replace('  ', ' ') \
                            .strip()
             print(u'❌  🎯 ' + ' ' + task['text'])
