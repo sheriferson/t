@@ -169,6 +169,7 @@ class TaskDict(object):
 
         """
         matched = filter(lambda tid: tid.startswith(prefix), self.tasks.keys())
+        matched = list(matched)
         if len(matched) == 1:
             return self.tasks[matched[0]] # pylint: disable=unsubscriptable-object
         elif len(matched) == 0:
