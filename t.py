@@ -45,7 +45,7 @@ def _hash(text):
 
     Currently SHA1 hashing is used.  It should be plenty for our purposes.
     """
-    return hashlib.sha1(text).hexdigest()
+    return hashlib.sha1(text.encode('utf-8')).hexdigest()
 
 def _task_from_taskline(taskline):
     """
