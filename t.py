@@ -202,7 +202,7 @@ class TaskDict(object):
             text = re.sub(find, repl, task['text'])
 
         task['text'] = text
-        print(u'🚧 ' + ' ' + text)
+        print(u'🚧' + ' ' + text)
 
     def make_task_today(self, prefix):
         """
@@ -220,11 +220,11 @@ class TaskDict(object):
                            .replace('@today', '') \
                            .replace('  ', ' ') \
                            .strip()
-            print(u'❌  📅 ' + ' ' + task['text'])
+            print(u'❌📅' + ' ' + task['text'])
         else:
             # add suffix @today tag
             task['text'] = task['text'] + " @today"
-            print(u'📅 ' + ' ' + task['text'])
+            print(u'📅' + ' ' + task['text'])
 
     def make_task_now(self, prefix):
         """
@@ -240,11 +240,11 @@ class TaskDict(object):
                            .replace('@now', '') \
                            .replace('  ', ' ') \
                            .strip()
-            print(u'❌  🎯 ' + ' ' + task['text'])
+            print(u'❌🎯' + ' ' + task['text'])
         else:
             # add @now tag
             task['text'] = task['text'] + " @now"
-            print(u'🎯 ' + ' ' + task['text'])
+            print(u'🎯' + ' ' + task['text'])
 
     def check_today_date(self):
         """
@@ -279,7 +279,7 @@ class TaskDict(object):
                        .replace('  ', ' ') \
                        .strip()
 
-        print(u'🏅 ' + ' ' + task['text'])
+        print(u'🏅' + ' ' + task['text'])
         unixTimeNow = int(time.mktime(time.localtime()))
         task['text'] = task['text'] + " [" + str(unixTimeNow) + "]"
         task['id'] = _hash(task['text']) # S edit
@@ -294,7 +294,7 @@ class TaskDict(object):
 
         """
         removedTask = self.tasks.pop(self[prefix]['id'])
-        print(u'❌ ' + ' ' + removedTask['text'])
+        print(u'❌' + ' ' + removedTask['text'])
 
 
     def print_list(self, kind='tasks', verbose=False, quiet=False, grep=''):
